@@ -82,6 +82,13 @@ const updateQuestion = async (req, res) => {
     const { questionId } = req.params;
     const updates = req.body;
 
+    if (!updates || typeof updates !== "object" || Array.isArray(updates)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Request body must be a valid object with fields to update" 
+      });
+    }
+
     const question = await Question.findById(questionId);
     if (!question) {
       return res.status(404).json({ 
@@ -108,6 +115,7 @@ const updateQuestion = async (req, res) => {
     res.status(400).json({ success: false, error: err.message });
   }
 };
+
 
 const deleteQuestion = async (req, res) => {
   try {

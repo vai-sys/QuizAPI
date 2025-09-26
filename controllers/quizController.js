@@ -1,7 +1,3 @@
-
-
-
-
 const Quiz = require("../models/Quiz");
 const Question = require("../models/Question");
 
@@ -195,9 +191,50 @@ const getCorrectAnswerForDisplay = (question) => {
   }
 };
 
+const deleteQuiz = async (req, res) => {
+  try {
+    const { quizId } = req.params;
+
+    if (!quizId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Quiz ID is required" 
+      });
+    }
+
+ 
+    const quiz = await Quiz.findById(quizId);
+    if (!quiz) {
+      return res.status(404).json({ 
+        success: false, 
+        error: "Quiz not found" 
+      });
+    }
+
+   
+    await Question.deleteMany({ _id: { $in: quiz.questions } });
+
+  
+    await Quiz.findByIdAndDelete(quizId);
+
+    res.json({ 
+      success: true,
+      message: "Quiz and its questions deleted successfully" 
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
+
+module.exports = { deleteQuiz };
+
+
 module.exports = { 
   createQuiz, 
   getAllQuizzes, 
   getQuizQuestions, 
-  submitAnswers 
+  submitAnswers ,
+  deleteQuiz
 };
