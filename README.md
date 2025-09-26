@@ -1,8 +1,8 @@
-# Quiz API 
+# Quiz API
 
 A comprehensive backend service for managing quizzes, questions, and submissions with detailed scoring and result generation.
 
-##  Features
+## Features
 
 - **Multiple Question Types**: Single-correct MCQs, Multiple-correct MCQs, and Text-based questions
 - **Smart Scoring**: Automatic scoring with detailed result generation
@@ -10,28 +10,29 @@ A comprehensive backend service for managing quizzes, questions, and submissions
 - **Data Validation**: Robust input validation and error handling
 - **MongoDB Integration**: Efficient data storage with Mongoose ODM
 
-## 📋 Table of Contents
+## Table of Contents
 
 - [Setup Instructions](#setup-instructions)
 - [API Endpoints](#api-endpoints)
 - [Question Types](#question-types)
 - [Testing](#testing)
 - [Project Structure](#project-structure)
-  
+- [Key Features & Assumptions](#key-features--assumptions)
 
-## 🛠️ Setup Instructions
+## Setup Instructions
 
 ### Prerequisites
 - Node.js (v14 or higher)
 - MongoDB (local or cloud instance)
-- npm 
+- npm
 
 ### Installation
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/<your-username>/quiz-api.git
-   cd quiz-api
+   git clone https://github.com/vai-sys/QuizAPI.git
+   cd QuizAPI
+   cd Backend
    ```
 
 2. **Install dependencies**
@@ -43,7 +44,7 @@ A comprehensive backend service for managing quizzes, questions, and submissions
    
    Create a `.env` file in the root directory:
    ```env
-   PORT=5000
+   PORT=3000
    MONGO_URI=mongodb://localhost:27017/quiz-api
    # For MongoDB Atlas:
    # MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/quiz-api
@@ -51,18 +52,22 @@ A comprehensive backend service for managing quizzes, questions, and submissions
 
 4. **Start the server**
    ```bash
-   # Development mode
+   # Development mode (with nodemon)
    npm run dev
+   # or
+   nodemon index.js
    
    # Production mode
    npm start
+   # or
+   node index.js
    ```
 
 5. **Verify setup**
    
    Server will be running at `http://localhost:3000`
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Quiz Management
 
@@ -84,7 +89,7 @@ A comprehensive backend service for managing quizzes, questions, and submissions
 | `PUT` | `/api/question/:questionId` | Update a question |
 | `DELETE` | `/api/question/:questionId` | Delete a question |
 
-## 📝 Question Types
+## Question Types
 
 ### 1. Single-Correct MCQ
 ```json
@@ -128,17 +133,80 @@ A comprehensive backend service for managing quizzes, questions, and submissions
 }
 ```
 
-## 🧪 Testing
+## Testing
 
 ### Using Postman
-https://www.postman.com/vais2005/workspace/quizapi/collection/37113333-5f90f698-0efb-4603-8e93-c9116e8b46ed?action=share&source=copy-link&creator=37113333
 
+Access the complete Postman collection for testing all API endpoints:
+
+**Postman Collection Link**: [Quiz API Collection](https://www.postman.com/vais2005/workspace/quizapi/collection/37113333-5f90f698-0efb-4603-8e93-c9116e8b46ed?action=share&source=copy-link&creator=37113333)
+
+### Manual Testing Examples
+
+#### 1. Create a Quiz
+```bash
+POST /api/quiz
+Content-Type: application/json
+
+{
+  "title": "JavaScript Basics"
+}
 ```
 
-## 📁 Project Structure
+#### 2. Add a Question
+```bash
+POST /api/quiz/{quizId}/questions
+Content-Type: application/json
+
+{
+  "text": "What is a closure in JavaScript?",
+  "type": "single",
+  "marks": 2,
+  "options": [
+    { "text": "A function with access to outer scope", "isCorrect": true },
+    { "text": "A loop structure", "isCorrect": false }
+  ]
+}
+```
+
+#### 3. Submit Answers
+```bash
+POST /api/quiz/{quizId}/submit
+Content-Type: application/json
+
+{
+  "answers": [
+    {
+      "questionId": "64a1b2c3d4e5f6789",
+      "selectedOptions": ["64a1b2c3d4e5f6790"],
+      "textAnswer": ""
+    }
+  ]
+}
+```
+
+### Sample Response (Quiz Submission)
+```json
+{
+  "totalQuestions": 5,
+  "totalMarks": 10,
+  "scoredMarks": 8,
+  "percentage": 80,
+  "results": [
+    {
+      "questionId": "64a1b2c3d4e5f6789",
+      "isCorrect": true,
+      "marksAwarded": 2,
+      "correctAnswer": ["Option A"]
+    }
+  ]
+}
+```
+
+## Project Structure
 
 ```
-quiz-api/
+QuizAPI/
 ├── models/
 │   ├── Quiz.js
 │   └── Question.js
@@ -153,12 +221,12 @@ quiz-api/
 ├── config/
 │   └── database.js
 ├── .env
-├── server.js
+├── index.js
 ├── package.json
 └── README.md
 ```
 
-##  Key Features & Assumptions
+## Key Features & Assumptions
 
 ### Design Choices
 - **Database**: MongoDB with Mongoose ODM for flexible schema design
@@ -170,11 +238,28 @@ quiz-api/
 - MCQ questions must have at least one correct option
 - Text questions require a correct answer for scoring
 - Quiz submission calculates total marks and percentage automatically
-- Partial scoring available for multiple-correct question
+- Partial scoring available for multiple-correct questions
 
 ### Scoring Logic
 - **Single MCQ**: Full marks for correct answer, zero for incorrect
 - **Multiple MCQ**: Proportional scoring based on correct selections
 - **Text Questions**: Exact match with correct answer (case-insensitive)
 
+
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Author
+
+**Vaishnavi Thorat**
+- GitHub: [@vai-sys](https://github.com/vai-sys)
+
 ---
+
+**Repository Link**: [https://github.com/vai-sys/QuizAPI.git](https://github.com/vai-sys/QuizAPI.git)
