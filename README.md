@@ -32,7 +32,6 @@ A comprehensive backend service for managing quizzes, questions, and submissions
    ```bash
    git clone https://github.com/vai-sys/QuizAPI.git
    cd QuizAPI
-   cd Backend
    ```
 
 2. **Install dependencies**
@@ -44,7 +43,7 @@ A comprehensive backend service for managing quizzes, questions, and submissions
    
    Create a `.env` file in the root directory:
    ```env
-   PORT=3000
+   PORT=5000
    MONGO_URI=mongodb://localhost:27017/quiz-api
    # For MongoDB Atlas:
    # MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/quiz-api
@@ -65,7 +64,7 @@ A comprehensive backend service for managing quizzes, questions, and submissions
 
 5. **Verify setup**
    
-   Server will be running at `http://localhost:3000`
+   Server will be running at `http://localhost:5000`
 
 ## API Endpoints
 
@@ -75,7 +74,6 @@ A comprehensive backend service for managing quizzes, questions, and submissions
 |--------|----------|-------------|
 | `POST` | `/api/quiz` | Create a new quiz |
 | `GET` | `/api/quiz` | Get all quizzes |
-| `GET` | `/api/quiz/:quizId` | Get a specific quiz |
 | `GET` | `/api/quiz/:quizId/questions` | Get all questions for a quiz |
 | `POST` | `/api/quiz/:quizId/submit` | Submit answers for a quiz |
 | `DELETE` | `/api/quiz/:quizId` | Delete a quiz |
@@ -128,7 +126,7 @@ A comprehensive backend service for managing quizzes, questions, and submissions
   "text": "What does API stand for?",
   "type": "text",
   "marks": 1,
-  "correctAnswer": "Application Programming Interface",
+  "correctTextAnswer": "Application Programming Interface",
   "hint": "It's about how applications communicate"
 }
 ```
@@ -159,12 +157,14 @@ POST /api/quiz/{quizId}/questions
 Content-Type: application/json
 
 {
-  "text": "What is a closure in JavaScript?",
+  "text": "What does 'let' keyword do in JavaScript?",
   "type": "single",
   "marks": 2,
+  "hint": "Think about variable scope",
   "options": [
-    { "text": "A function with access to outer scope", "isCorrect": true },
-    { "text": "A loop structure", "isCorrect": false }
+    { "text": "Defines a variable with block scope", "isCorrect": true },
+    { "text": "Defines a global variable", "isCorrect": false },
+    { "text": "Creates a constant", "isCorrect": false }
   ]
 }
 ```
@@ -177,9 +177,12 @@ Content-Type: application/json
 {
   "answers": [
     {
-      "questionId": "64a1b2c3d4e5f6789",
-      "selectedOptions": ["64a1b2c3d4e5f6790"],
-      "textAnswer": ""
+      "questionId": "68d6e5b6d987953bf16dacf5",
+      "selectedOptionIds": ["68d6e5b6d987953bf16dacf6"]
+    },
+    {
+      "questionId": "68d6e833d987953bf16dad04",
+      "textAnswer": "object"
     }
   ]
 }
@@ -188,16 +191,65 @@ Content-Type: application/json
 ### Sample Response (Quiz Submission)
 ```json
 {
-  "totalQuestions": 5,
+  "success": true,
+  "score": 6,
   "totalMarks": 10,
-  "scoredMarks": 8,
-  "percentage": 80,
+  "percentage": 60,
   "results": [
     {
-      "questionId": "64a1b2c3d4e5f6789",
-      "isCorrect": true,
-      "marksAwarded": 2,
-      "correctAnswer": ["Option A"]
+      "questionId": "68d6e5b6d987953bf16dacf5",
+      "correct": true,
+      "userAnswer": [
+        "68d6e5b6d987953bf16dacf6"
+      ],
+      "correctAnswer": [
+        {
+          "_id": "68d6e5b6d987953bf16dacf6",
+          "text": "Defines a variable with block scope"
+        }
+      ]
+    },
+    {
+      "questionId": "68d6e81fd987953bf16dacfc",
+      "correct": false,
+      "userAnswer": [
+        "68d6e81fd987953bf16dacfd",
+        "68d6e81fd987953bf16dacfe",
+        "68d6e81fd987953bf16dad00"
+      ],
+      "correctAnswer": [
+        {
+          "_id": "68d6e81fd987953bf16dacfd",
+          "text": "String"
+        },
+        {
+          "_id": "68d6e81fd987953bf16dacfe",
+          "text": "Number"
+        },
+        {
+          "_id": "68d6f1d20a064cd7d646608a",
+          "text": "Boolean"
+        }
+      ]
+    },
+    {
+      "questionId": "68d6e833d987953bf16dad04",
+      "correct": true,
+      "userAnswer": "object",
+      "correctAnswer": "object"
+    },
+    {
+      "questionId": "68d6e844d987953bf16dad08",
+      "correct": true,
+      "userAnswer": [
+        "68d6e844d987953bf16dad09"
+      ],
+      "correctAnswer": [
+        {
+          "_id": "68d6e844d987953bf16dad09",
+          "text": "push()"
+        }
+      ]
     }
   ]
 }
@@ -207,19 +259,17 @@ Content-Type: application/json
 
 ```
 QuizAPI/
+├── config/
+│   └── db.js
+├── controllers/
+│   ├── quizController.js
+│   └── questionController.js
 ├── models/
 │   ├── Quiz.js
 │   └── Question.js
 ├── routes/
 │   ├── quizRoutes.js
 │   └── questionRoutes.js
-├── controllers/
-│   ├── quizController.js
-│   └── questionController.js
-├── middleware/
-│   └── validation.js
-├── config/
-│   └── database.js
 ├── .env
 ├── index.js
 ├── package.json
@@ -231,29 +281,58 @@ QuizAPI/
 ### Design Choices
 - **Database**: MongoDB with Mongoose ODM for flexible schema design
 - **Architecture**: RESTful API following MVC pattern
-- **Validation**: Comprehensive input validation for all endpoints
+- **Validation**: Comprehensive input validation at model level using Mongoose pre-validation hooks
 - **Error Handling**: Structured error responses with appropriate HTTP status codes
 
 ### Business Rules
-- MCQ questions must have at least one correct option
-- Text questions require a correct answer for scoring
-- Quiz submission calculates total marks and percentage automatically
-- Partial scoring available for multiple-correct questions
+- **Single MCQ**: Must have exactly one correct option
+- **Multiple MCQ**: Must have at least one correct option
+- **Text Questions**: Require a `correctTextAnswer` field for scoring
+- **Quiz Deletion**: Automatically deletes all associated questions
+- **Question Deletion**: Automatically removes question reference from quiz
+
+### Validation Rules
+- Quiz title is required and cannot be empty
+- Question text is required (max 300 characters)
+- Question type must be one of: "single", "multiple", "text"
+- Options are required for MCQ questions
+- Text answers are case-insensitive during comparison
+- Marks must be at least 1
 
 ### Scoring Logic
 - **Single MCQ**: Full marks for correct answer, zero for incorrect
-- **Multiple MCQ**: Proportional scoring based on correct selections
-- **Text Questions**: Exact match with correct answer (case-insensitive)
+- **Multiple MCQ**: Full marks only if all correct options are selected and no incorrect ones
+- **Text Questions**: Exact match with correct answer (case-insensitive, trimmed)
+
+## API Response Format
+
+All API responses follow a consistent format:
+
+### Success Response
+```json
+{
+  "success": true,
+  "message": "Operation completed successfully",
+  "data": {...}
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "error": "Error message describing what went wrong"
+}
+```
 
 
+## Dependencies
 
-## Contributing
+- **express**: Web framework for Node.js
+- **mongoose**: MongoDB object modeling for Node.js
+- **dotenv**: Loads environment variables from .env file
+- **body-parser**: Parse incoming request bodies
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
 
 ## Author
 
