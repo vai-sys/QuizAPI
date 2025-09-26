@@ -197,19 +197,6 @@ Content-Type: application/json
   "percentage": 60,
   "results": [
     {
-      "questionId": "68d6e5b6d987953bf16dacf5",
-      "correct": true,
-      "userAnswer": [
-        "68d6e5b6d987953bf16dacf6"
-      ],
-      "correctAnswer": [
-        {
-          "_id": "68d6e5b6d987953bf16dacf6",
-          "text": "Defines a variable with block scope"
-        }
-      ]
-    },
-    {
       "questionId": "68d6e81fd987953bf16dacfc",
       "correct": false,
       "userAnswer": [
@@ -233,24 +220,21 @@ Content-Type: application/json
       ]
     },
     {
-      "questionId": "68d6e833d987953bf16dad04",
-      "correct": true,
-      "userAnswer": "object",
-      "correctAnswer": "object"
-    },
-    {
-      "questionId": "68d6e844d987953bf16dad08",
+      "questionId": "68d6e5b6d987953bf16dacf5",
       "correct": true,
       "userAnswer": [
-        "68d6e844d987953bf16dad09"
+        "68d6e5b6d987953bf16dacf6"
       ],
       "correctAnswer": [
         {
-          "_id": "68d6e844d987953bf16dad09",
-          "text": "push()"
+          "_id": "68d6e5b6d987953bf16dacf6",
+          "text": "Defines a variable with block scope"
         }
       ]
     }
+    
+    
+    
   ]
 }
 ```
