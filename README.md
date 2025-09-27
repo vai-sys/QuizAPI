@@ -51,15 +51,13 @@ A comprehensive backend service for managing quizzes, questions, and submissions
 
 4. **Start the server**
    ```bash
-   # Development mode (with nodemon)
+   # Development mode 
    npm run dev
-   # or
-   nodemon index.js
+  
    
    # Production mode
    npm start
-   # or
-   node index.js
+ 
    ```
 
 5. **Verify setup**
