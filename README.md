@@ -317,6 +317,9 @@ All API responses follow a consistent format:
 - **dotenv**: Loads environment variables from .env file
 - **body-parser**: Parse incoming request bodies
 
+## Deployed Version 
+   Access here - https://quizapi-4-5b0a.onrender.com/
+
 
 ## Author
 
