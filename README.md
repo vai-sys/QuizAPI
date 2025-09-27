@@ -297,7 +297,7 @@ All API responses follow a consistent format:
 {
   "success": true,
   "message": "Operation completed successfully",
-  "data": {...}
+  "data": {.....}
 }
 ```
 
